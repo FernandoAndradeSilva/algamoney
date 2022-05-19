@@ -1,11 +1,13 @@
 package com.example.algamoney.api.resource;
 
+import java.util.List;
 import java.util.Optional;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 import com.example.algamoney.api.event.RecursoCriadoEvent;
+import com.example.algamoney.api.model.Categoria;
 import com.example.algamoney.api.model.Pessoa;
 import com.example.algamoney.api.repository.PessoaRepository;
 import com.example.algamoney.api.service.PessoaService;
@@ -37,12 +39,15 @@ public class PessoaResource {
     @Autowired
     private ApplicationEventPublisher publisher;
 
+    @GetMapping
+    public List<Pessoa> listar() {
+        return pessoaRepository.findAll();
+    }
+
     @PostMapping
     public ResponseEntity<Pessoa> criar(@Valid @RequestBody Pessoa pessoa, HttpServletResponse response) {
         Pessoa pessoaSalva = pessoaRepository.save(pessoa);
-
         publisher.publishEvent(new RecursoCriadoEvent(this, response, pessoaSalva.getCodigo()));
-
         return ResponseEntity.status(HttpStatus.CREATED).body(pessoaSalva);
     }
 
